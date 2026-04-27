@@ -1,37 +1,20 @@
-import re
-import sys
-import requests
-from bs4 import BeautifulSoup
-import json
-import csv  # importing all the libraries needed
+import streamlit as st
+import sqlite3
+import pandas as pd
 # compare page 
 
-def scrape(url):
-    headers = {"User-Agent": "Mozilla/5.0"}  # fake user for browser
-    results = []  # empty list for results
+st.title("Compare Our Price")
 
-    response = requests.get(  # get the website
-        "https://shaniwigs.com/collections/wigs/products.json?limit=250",
-        headers=headers
-    )
-    # use BeautifulSoup to parse the response text
-    soup = BeautifulSoup(response.text, "html.parser")
- 
-    # extract the text content and parse as JSON
-    data = json.loads(soup.get_text())
-    # do this to see the data formatted nicely
-    # print(json.dumps(data, indent=2))
-    for product in data["products"]:
-        description = product["tags"]
-        price = "$" + product["variants"][0]["price"]  # price is inside variants with name price
-        results.append([description, price])
-    
-    print(results)
-        
-
-def main():
-    wigs = scrape("https://shaniwigs.com/collections/wigs")
-    for wig in wigs:
-        print(wig)
-if __name__ == "__main__":
-    main()
+st.markdown("At Ora Wigs you get luxury Wigs for a fraction of the price")
+st.markdown("look at the table below to see other brands prices compared to our price for the same wig!")
+conn2 = sqlite3.connect('OraWigs.db')  # open connection
+cur2 = conn2.cursor()
+# get the information from ComparePrice table, and change the name of fields so it is user friendly
+df = pd.read_sql_query(""" 
+    SELECT 
+        Description AS 'Wig Details',
+        OtherBrands AS 'Other Brands Price', 
+        OraPrice AS 'Ora Wigs Price' 
+    FROM ComparePrice
+""", conn2)
+st.dataframe(df)  # put into a data frame to be viewed easily by the user
