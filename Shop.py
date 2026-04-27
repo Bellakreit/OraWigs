@@ -5,7 +5,7 @@ import plotly.express as px
 
 st.title("Shop Page")
 
-st.markdown("Our most popular wig right now is...")
+st.markdown("Our most popular wig based on our purchases right now is...")
 conn2 = sqlite3.connect('OraWigs.db')  # open connection
 cur2 = conn2.cursor()
 df = pd.read_sql_query("SELECT Wig_Type, COUNT(*) as count FROM Purchases GROUP BY Wig_Type", conn2)
