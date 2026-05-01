@@ -62,7 +62,7 @@ def scrape():
     # use BeautifulSoup to parse the response text
     soup = BeautifulSoup(response.text, "html.parser")
  
-    # extract the text content and parse as JSON
+    # parse as JSON because the content of the website is in JSON format
     data = json.loads(soup.get_text())
     # do this to see the data formatted nicely
     # print(json.dumps(data, indent=2))
