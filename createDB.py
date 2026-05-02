@@ -1,6 +1,5 @@
 import sqlite3
 import requests
-from bs4 import BeautifulSoup
 import json
 
 conn = sqlite3.connect('OraWigs.db')  # connecting to database
@@ -50,32 +49,23 @@ if cur.fetchone()[0] == 0:
     conn.commit()
 
 #function for scraping the website
-def scrape():
+def getAPI():
     headers = {"User-Agent": "Mozilla/5.0"}  # fake user for browser
-    results = []  # empty list for results
     # oras is array of prices based on the json I made an array in order of the json products with accurate prices of ora wigs to compare to the other brand wigs
     oras = ["$1500.00", "$2000.00", "$1200.00", "$2150.00", "$1750.00", "$1750.00", "$1000.00", "$1200.00", "$2500.00", "$2000.00", "$1500.00"]
+    
     response = requests.get(  # get the website
         "https://shaniwigs.com/collections/wigs/products.json?limit=250",
         headers=headers
     )
-    # use BeautifulSoup to parse the response text
-    soup = BeautifulSoup(response.text, "html.parser")
- 
     # parse as JSON because the content of the website is in JSON format
-    data = json.loads(soup.get_text())
-    # do this to see the data formatted nicely
-    # print(json.dumps(data, indent=2))
+    data = response.json()
     
-    for product in data["products"]:
-        description = ", ".join(product["tags"])
-        # stores as string for database
-        price = "$" + product["variants"][0]["price"]  # price is inside variants with name price
-        results.append([description, price])
     paired = []
-    for result, ora_price in zip(results, oras):  # zip will pair the ora price to each result by position in array and will only do the amount of ora prices I put in
-        result.append(ora_price)  # add in the ora price
-        paired.append(result)  # add the paired result to the paired list
+    for product, ora_price in zip(data["products"], oras):  # zip will pair the ora price to each result by position in array and will only do the amount of ora prices I put in
+        description = ", ".join(product["tags"])
+        price = "$" + product["variants"][0]["price"]  # price is inside variants with name price
+        paired.append([description, price, ora_price])  # add the paired result to the paired list
     
     return paired  # only returns the wigs that have ora prices
 
@@ -90,7 +80,7 @@ CREATE TABLE IF NOT EXISTS ComparePrice (
 #adding description price of other brand and price of ora wigs to the table
 cur.execute("SELECT COUNT(*) FROM ComparePrice")
 if cur.fetchone()[0] == 0:
-    ComparePrice = scrape()  # the list to be added to the table is what was scraped from "https://shaniwigs.com/collections/wigs"
+    ComparePrice = getAPI()  # the list to be added to the table is what was scraped from "https://shaniwigs.com/collections/wigs"
     cur.executemany("INSERT INTO ComparePrice VALUES (?, ?, ?)", ComparePrice)  # insert values into ComparePrice table
     conn.commit()
 
