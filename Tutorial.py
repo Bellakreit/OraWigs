@@ -32,10 +32,9 @@ if prompt := st.chat_input("Ask for a head measuring tutorial"):  # setting a pr
     # stream goes here, only runs when user sends a message
     stream = client.chat.completions.create(
         model=st.secrets["AZURE_OPENAI_MODEL"],
-        # the ai knows its role as a lady helping the client measure their heads for wigs
+        # the ai knows its role as a lady helping the client measure their heads for wigs and not to answer questions on off topics
         messages=[
-            {"role": "system", "content": "You are a friendly lady chatbot helping clients learn how to measure their head for wig."},
-            *st.session_state.messages
+            {"role": "system", "content": "You are a friendly lady chatbot named Mrs. Wigs helping clients learn about wigs. You only answer questions related to wigs, hair, and head measuring for wigs. If the user asks about anything unrelated to wigs, politely let them know you can only help with wig related questions."},
         ],
         stream=True,
     )
