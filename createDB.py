@@ -21,8 +21,8 @@ CREATE TABLE IF NOT EXISTS Customers (
 cur.execute("SELECT COUNT(*) FROM Customers")
 if cur.fetchone()[0] == 0:
     Customers = [  # list to be added to table
-        (1, "Bellak", "Bella111", "Bella", "Kreitenberg", "Bella@kreit.net", "8184868879"),
-        (2, "skreit", "shain123", "Shaindee", "Kreitenberg", "skreit@kreit.net", "3106330245"),
+        (1, "Bellak", "Bella111", "Bella", "Kreit", "Bella@gmail.com", "8184869999"),
+        (2, "skreit", "shain123", "Shaindee", "Kreit", "sk@gmail.net", "31039380245"),
     ]
     cur.executemany("INSERT INTO Customers VALUES (?, ?, ?, ?, ?, ?, ?)", Customers)  # insert values in customers list
     conn.commit()
@@ -40,10 +40,10 @@ CREATE TABLE IF NOT EXISTS Purchases (
 cur.execute("SELECT COUNT(*) FROM Purchases")
 if cur.fetchone()[0] == 0:
     Purchases = [  # list to be added to table
-        (1, "Bella", "kreitenberg", "Luxury long brunette"),
-        (2, "Shaindee", "Kreitenberg", "short pixie"),
+        (1, "Bella", "kreit", "Luxury long brunette"),
+        (2, "Shaindee", "Kreit", "short pixie"),
         (3, "Rachel", "Kreit", "Luxury long brunette"),
-        (4, "Sarah", "leibowitz", "Honey Blonde mom length")
+        (4, "Sarah", "leiba", "Honey Blonde mom length")
     ]
     cur.executemany("INSERT INTO Purchases VALUES (?, ?, ?, ?)", Purchases)  # insert values into purchases
     conn.commit()
