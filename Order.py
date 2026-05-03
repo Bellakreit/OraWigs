@@ -3,16 +3,16 @@ import sqlite3
 
 st.title("Order Now")
 
-def CustomOrder_Click():  # when the old customer button is clicked function
-    st.session_state.show_form = True
-    # st.session_state.customer_type = "existing"  # keep track that the customer is existing one
-
 def buildEmailBody(color, length, texture, hairtype, wigtype, lining, head, front, ear): # build the email body string. Raises ValueError if any field is empty
     if not color or not length or not texture or not hairtype or not wigtype or not lining or not head or not front or not ear:
         raise ValueError("Please fill in all fields.")
     # body takes all the fields and put them into a message that will be sent in the email, %0A is a line break in the email and %0A%0A is to skip a line
     body = f"Hi Ora Wigs, I would like to place a custom order with the following details:%0A%0AColor: {color}%0ALength: {length} inches%0ATexture: {texture}%0AHair Type: {hairtype}%0AWig Type: {wigtype}%0ALining: {lining}%0A%0AMeasurements:%0AHead Circumference: {head} cm%0AFront to Back: {front} cm%0AEar to Ear: {ear} cm%0A%0AThank you!"
     return body
+
+def CustomOrder_Click():  # when the old customer button is clicked function
+    st.session_state.show_form = True
+    # st.session_state.customer_type = "existing"  # keep track that the customer is existing one
 
 btnCustomOrder = st.button("Make a Custom Order", type="primary", on_click=CustomOrder_Click)
 

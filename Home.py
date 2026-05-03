@@ -76,9 +76,10 @@ if st.session_state.show_form:
             try:
                 conn2 = sqlite3.connect('OraWigs.db')  # open connection
                 AddCustomer(conn2, UserName, Password, FirstName, LastName, Email, Phone)  # uses function to add customer to db
-                st.session_state.show_form = False  # closes form after saved
                 conn2.close()  # close connection
                 st.success("Profile saved!")
+                st.session_state.show_form = False  # closes form after saved
+                # st.rerun()
             except ValueError as e:  # if addcustomer found an error because the fields werent all filled
                  st.error(str(e))
 
@@ -95,6 +96,8 @@ if st.session_state.show_form:
                 st.success(f"Welcome back {customer[0]} {customer[1]}!")
                     # customer[0] = FirstName
                     # customer[1] = LastName
+                st.session_state.show_form = False  # closes form  after pressing login
+                # st.rerun()
             except ValueError as e:  # if customer was not found print error message
                 st.error(str(e))
-        st.session_state.show_form = False  # closes form  after pressing login
+        
