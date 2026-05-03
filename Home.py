@@ -79,7 +79,6 @@ if st.session_state.show_form:
                 conn2.close()  # close connection
                 st.success("Profile saved!")
                 st.session_state.show_form = False  # closes form after saved
-                st.rerun()
             except ValueError as e:  # if addcustomer found an error because the fields werent all filled
                  st.error(str(e))
 
@@ -97,7 +96,6 @@ if st.session_state.show_form:
                     # customer[0] = FirstName
                     # customer[1] = LastName
                 st.session_state.show_form = False  # closes form  after pressing login
-                st.rerun()
             except ValueError as e:  # if customer was not found print error message
                 st.error(str(e))
         
