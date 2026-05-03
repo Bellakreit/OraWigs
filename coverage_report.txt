@@ -1,0 +1,32 @@
+============================= test session starts ==============================
+platform linux -- Python 3.11.13, pytest-9.0.3, pluggy-1.6.0
+rootdir: /workspaces/OraWigs
+plugins: cov-7.1.0, anyio-4.13.0
+collected 14 items
+
+tests/test_HairColor.py ...                                              [ 21%]
+tests/test_Home.py ......                                                [ 64%]
+tests/test_Order.py ..                                                   [ 78%]
+tests/test_createDB.py ...                                               [100%]
+
+================================ tests coverage ================================
+_______________ coverage: platform linux, python 3.11.13-final-0 _______________
+
+Name                      Stmts   Miss  Cover
+---------------------------------------------
+Compare.py                   10     10     0%
+HairColor.py                 45      0   100%
+Home.py                      70     37    47%
+OraWigs_app.py               10     10     0%
+Order.py                     32     20    38%
+PopularWig.py                12     12     0%
+Tutorial.py                  24     24     0%
+createDB.py                  45     11    76%
+tests/__init__.py             0      0   100%
+tests/test_HairColor.py      39      0   100%
+tests/test_Home.py           38      0   100%
+tests/test_Order.py          10      0   100%
+tests/test_createDB.py       29      0   100%
+---------------------------------------------
+TOTAL                       364    124    66%
+============================== 14 passed in 1.74s ==============================

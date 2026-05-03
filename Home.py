@@ -2,6 +2,41 @@ import streamlit as st
 import sqlite3
 # home page
 
+# logic/functions:
+
+def AddCustomer(conn, UserName, Password, FirstName, LastName, Email, Phone):
+    if not UserName or not Password or not FirstName or not LastName or not Email or not Phone:  # checking all fields are filled
+        raise ValueError("All fields must be filled in.")  # raise error so the button code can catch it
+    cur = conn.cursor()
+    cur.execute("""
+    INSERT INTO Customers (UserName, Password, FirstName, LastName, Email, Phone)
+        VALUES (?, ?, ?, ?, ?, ?)
+    """, (UserName, Password, FirstName, LastName, Email, Phone))
+    conn.commit()
+
+
+def LoginCustomer(conn, UserName, Password):
+    if not UserName or not Password:  # check if fields are empty
+        raise ValueError("All fields must be filled in.")  # raise error so the button code can catch it
+    # look up user in database
+    cur = conn.cursor()
+    # first check if username exists
+    cur.execute("SELECT * FROM Customers WHERE UserName = ?", (UserName,))
+    user = cur.fetchone()
+    if not user:
+        raise ValueError("Username not found.")
+    
+    # then check if password matches and just select the first and last name to return
+    cur.execute("SELECT FirstName, LastName FROM Customers WHERE UserName = ? AND Password = ?", (UserName, Password))
+    customer = cur.fetchone()
+    if not customer:
+        raise ValueError("Incorrect password.")
+    
+    return customer
+
+
+# streamlit page:
+
 st.title("ORA WIGS", text_alignment="center")  # setting title, header and subheader for home page
 st.header("Luxury wigs made to feel completely you", text_alignment="center")
 st.subheader("Effortless beauty, affordable luxury, high-end feel", text_alignment="center")
@@ -38,20 +73,14 @@ if st.session_state.show_form:
         Email = customerForm.text_input('Email')
         Phone = customerForm.text_input('Phone Number')
         if customerForm.form_submit_button("Save"):
-            if not UserName or not Password or not FirstName or not LastName or not Email or not Phone:  # checking all fields are filled
-                st.error("Please fill in all fields.")
-            else:
+            try:
                 conn2 = sqlite3.connect('OraWigs.db')  # open connection
-                cur2 = conn2.cursor()
-                cur2.execute("""
-                INSERT INTO Customers (UserName, Password, FirstName, LastName, Email, Phone)
-                    VALUES (?, ?, ?, ?, ?, ?)
-                """, (UserName, Password, FirstName, LastName, Email, Phone))
-                conn2.commit()
+                AddCustomer(conn2, UserName, Password, FirstName, LastName, Email, Phone)  # uses function to add customer to db
                 st.session_state.show_form = False  # closes form after saved
                 conn2.close()  # close connection
                 st.success("Profile saved!")
-
+            except ValueError as e:  # if addcustomer found an error because the fields werent all filled
+                 st.error(str(e))
 
     elif st.session_state.customer_type == "existing":  # if the customer is existing then bring the form up
         loginForm = st.form('Login')
@@ -59,21 +88,13 @@ if st.session_state.show_form:
         UserName = loginForm.text_input('User Name')  # inputs the username and password and then will be looked up
         Password = loginForm.text_input('Password')
         if loginForm.form_submit_button("Login"):
-            if not UserName or not Password:  # check if fields are empty
-                st.error("Please fill in all fields.")
-            else:
-                # look up user in database
+            try:
                 conn2 = sqlite3.connect('OraWigs.db')  # open connection
-                cur2 = conn2.cursor()
-                cur2.execute("SELECT FirstName, LastName, Email, Phone FROM Customers WHERE UserName = ? AND Password = ?", 
-                        (UserName, Password))
-                customer = cur2.fetchone()
+                customer = LoginCustomer(conn2, UserName, Password)  # retrieve data from db
                 conn2.close()  # close connection
-                if customer:  # if a customer was found print success message
-                    st.success(f"Welcome back {customer[0]} {customer[1]}!")
+                st.success(f"Welcome back {customer[0]} {customer[1]}!")
                     # customer[0] = FirstName
                     # customer[1] = LastName
-                else:  # if customer was not found print error message
-                    st.error("Username or password not found.")
-            st.session_state.show_form = False  # closes form  after pressing login
-
+            except ValueError as e:  # if customer was not found print error message
+                st.error(str(e))
+        st.session_state.show_form = False  # closes form  after pressing login

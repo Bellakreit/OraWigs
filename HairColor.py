@@ -6,8 +6,7 @@ import re
 # hair color page, scrape the hair color info from wiki how website 
 # and store it in database and then display it on my streamlit app
 
-def createTable():  # making the table to store the scraped data
-    conn = sqlite3.connect("OraWigs.db")
+def createTable(conn):  # making the table to store the scraped data
     cur = conn.cursor()
     cur.execute("""
         CREATE TABLE IF NOT EXISTS HairColorTips (
@@ -17,17 +16,19 @@ def createTable():  # making the table to store the scraped data
         )
     """)
     conn.commit()
-    conn.close()
 
 # scraping the data and storing each step with its explanation into the table
-def scrapeAndStore():
-    headers = {"User-Agent": "Mozilla/5.0"}
-    response = requests.get("https://www.wikihow.com/Choose-Hair-Color-for-Skin-Tone", headers=headers)
-    soup = BeautifulSoup(response.text, "html.parser")
-
-    conn = sqlite3.connect("OraWigs.db")
+def scrapeAndStore(conn):
+    try:
+        headers = {"User-Agent": "Mozilla/5.0"}
+        response = requests.get("https://www.wikihow.com/Choose-Hair-Color-for-Skin-Tone", headers=headers)
+        response.raise_for_status()  # raises error if request failed
+        soup = BeautifulSoup(response.text, "html.parser")
+    except requests.exceptions.HTTPError as e:
+        print(f"Error: Could not reach wikihow: {e}")
+        return  # stop here, don't try to parse or insert anything
+    
     cur = conn.cursor()
-
     # clear old data so we don't get duplicates on re-scrape
     cur.execute("DELETE FROM HairColorTips")
 
@@ -49,25 +50,24 @@ def scrapeAndStore():
             )
 
     conn.commit()
-    conn.close()
 
 # retreiving the info from the database with a query
-def getInfo():
-    conn = sqlite3.connect("OraWigs.db")
+def getInfo(conn):
     cur = conn.cursor()
     cur.execute("SELECT heading, tip FROM HairColorTips")
     rows = cur.fetchall()
-    conn.close()
     return rows
 
 
 # designing the page
 st.title("Hair Color for Your Skin Tone")
 st.markdown("how to choose a hair color that suits you best")
-createTable()  # call the method to create the table in th database
-scrapeAndStore()   # call method to scrape the data and store it
+conn = sqlite3.connect("OraWigs.db")
+createTable(conn)  # call the method to create the table in th database
+scrapeAndStore(conn)   # call method to scrape the data and store it
 
-info = getInfo()  # get the lists of tuples from the database and store in variable
+info = getInfo(conn)  # get the lists of tuples from the database and store in variable
+conn.close()
 
 for heading, tip in info:  # for every header and tip display it on the page
     st.subheader(heading)

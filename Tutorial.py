@@ -29,17 +29,19 @@ if prompt := st.chat_input("Ask for a head measuring tutorial"):  # setting a pr
     with st.chat_message("user"):
         st.markdown(prompt)
 
-    # stream goes here, only runs when user sends a message
-    stream = client.chat.completions.create(
-        model=st.secrets["AZURE_OPENAI_MODEL"],
-        # the ai knows its role as a lady helping the client measure their heads for wigs and not to answer questions on off topics
-        messages=[
-            {"role": "system", "content": "You are a friendly lady chatbot named Mrs. Wigs helping clients learn about wigs. You only answer questions related to wigs, hair, and head measuring for wigs. If the user asks about anything unrelated to wigs, politely let them know you can only help with wig related questions."},
-        ],
-        stream=True,
-    )
+    try: # putting a try so if keys or something doesnt work with ai connection a user friendly message comes up
+        # stream goes here, only runs when user sends a message
+        stream = client.chat.completions.create(
+            model=st.secrets["AZURE_OPENAI_MODEL"],
+            # the ai knows its role as a lady helping the client measure their heads for wigs and not to answer questions on off topics
+            messages=[
+                {"role": "system", "content": "You are a friendly lady chatbot named Mrs. Wigs helping clients learn about wigs. You only answer questions related to wigs, hair, and head measuring for wigs. If the user asks about anything unrelated to wigs, politely let them know you can only help with wig related questions."},
+            ],
+            stream=True,
+        )
 
-    with st.chat_message("assistant"):
-        response = st.write_stream(stream)
-    st.session_state.messages.append({"role": "assistant", "content": response})
-
+        with st.chat_message("assistant"):
+            response = st.write_stream(stream)
+        st.session_state.messages.append({"role": "assistant", "content": response})
+    except Exception as e:  # catches any openai error
+        st.error(f"Mrs. Wigs is unavailable right now. Please try again later.")

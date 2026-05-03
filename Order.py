@@ -7,6 +7,13 @@ def CustomOrder_Click():  # when the old customer button is clicked function
     st.session_state.show_form = True
     # st.session_state.customer_type = "existing"  # keep track that the customer is existing one
 
+def buildEmailBody(color, length, texture, hairtype, wigtype, lining, head, front, ear): # build the email body string. Raises ValueError if any field is empty
+    if not color or not length or not texture or not hairtype or not wigtype or not lining or not head or not front or not ear:
+        raise ValueError("Please fill in all fields.")
+    # body takes all the fields and put them into a message that will be sent in the email, %0A is a line break in the email and %0A%0A is to skip a line
+    body = f"Hi Ora Wigs, I would like to place a custom order with the following details:%0A%0AColor: {color}%0ALength: {length} inches%0ATexture: {texture}%0AHair Type: {hairtype}%0AWig Type: {wigtype}%0ALining: {lining}%0A%0AMeasurements:%0AHead Circumference: {head} cm%0AFront to Back: {front} cm%0AEar to Ear: {ear} cm%0A%0AThank you!"
+    return body
+
 btnCustomOrder = st.button("Make a Custom Order", type="primary", on_click=CustomOrder_Click)
 
 if "show_form" not in st.session_state:  # default for the form is false until the button is clicked
@@ -26,12 +33,10 @@ if st.session_state.show_form:  # if the button was clicked for custom order the
         my_front = st.text_input("Front to back (cm): ")
         my_ear = st.text_input("Ear to ear (cm): ")
         if st.form_submit_button('press here to get button to send your order in'):
-            if not my_color or not my_length or not my_texture or not my_hairtype or not my_wigtype or not my_lining or not my_head or not my_front or not my_ear:  # checking all fields are filled
-                st.error("Please fill in all fields.")
-            else:
-                body = f"Hi Ora Wigs, I would like to place a custom order with the following details:%0A%0AColor: {my_color}%0ALength: {my_length} inches%0ATexture: {my_texture}%0AHair Type: {my_hairtype}%0AWig Type: {my_wigtype}%0ALining: {my_lining}%0A%0AMeasurements:%0AHead Circumference: {my_head} cm%0AFront to Back: {my_front} cm%0AEar to Ear: {my_ear} cm%0A%0AThank you!"
-                # body takes all the fields and put them into a message that will be sent in the email, %0A is a line break in the email and %0A%0A is to skip a line
+            try:
+                body = buildEmailBody(my_color, my_length, my_texture, my_hairtype, my_wigtype, my_lining, my_head, my_front, my_ear)
                 st.markdown(f'<a href="mailto:bella@kreit.net?subject=Wig Inquiry&body={body}">Click Here to send your order</a>', unsafe_allow_html=True)
-        # it will send to bella@kreit.net with the subject and body filled in
-        # you click on click here to send your order and it will take you to your email, unsafe_allow_html=True so that streamlit will allow outside websites
-
+                # it will send to bella@kreit.net with the subject and body filled in
+                # you click on click here to send your order and it will take you to your email, unsafe_allow_html=True so that streamlit will allow outside websites
+            except ValueError as e:
+                st.error(str(e))
